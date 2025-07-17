@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AyurSanvaad Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f3f3f3;
+    }
+    #chat-box {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #chat-history {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 200px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+      background-color: #fafafa;
+    }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-right: 5px;
+    }
+    button {
+      padding: 10px;
+      background-color: #678d58;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-box">
+    <h2>🪷 AyurSanvaad</h2>
+    <div id="chat-history"></div>
+    <input type="text" id="user-input" placeholder="Ask something about Ayurveda...">
+    <button onclick="sendQuery()">Send</button>
+  </div>
+
+  <script>
+    async function sendQuery() {
+      const query = document.getElementById("user-input").value;
+      const chatHistoryDiv = document.getElementById("chat-history");
+      if (!query.trim()) return;
+
+      // Display user query
+      chatHistoryDiv.innerHTML += `<p><strong>You:</strong> ${query}</p>`;
+      document.getElementById("user-input").value = "";
+
+      try {
+        const response = await fetch("http://192.168.1.6:8000/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: new URLSearchParams({ query })
+        });
+
+        const data = await response.json();
+        chatHistoryDiv.innerHTML += `<p><strong>AyurSanvaad:</strong> ${data.response}</p>`;
+        chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+      } catch (error) {
+        chatHistoryDiv.innerHTML += `<p style='color:red'><strong>Error:</strong> ${error.message}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
